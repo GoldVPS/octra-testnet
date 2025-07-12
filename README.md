@@ -3,6 +3,8 @@
 An automatic installer for running the Octra Testnet wallet generator and multi-send bot,
 designed to be beginner-friendly — even for those with no coding knowledge.
 
+**Need powerful VPS with NVMe + affordable prices?**
+**Order now:** https://goldvps.net
 ------------------------------------------------------------
 
 ✨ Key Features
@@ -60,11 +62,13 @@ chmod +x octra-auto.sh
 
 ------------------------------------------------------------
 
-🌐 Credit
+## MADE BY [GOLDVPS](https://goldvps.net)
+------------------------------------------------------------
 
-Script built and customized by the GoldVPS Team
-Website : https://goldvps.net
-Telegram: @miftaikyy
+Created by: https://t.me/miftaikyy
+
+Need powerful VPS with NVMe + affordable prices?  
+Order now: https://goldvps.net
 
 ------------------------------------------------------------
 

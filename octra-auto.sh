@@ -104,6 +104,10 @@ function main_menu() {
         read -r choice
         case $choice in
             1)
+                install_dependencies
+                install_bun_if_needed
+                configure_firewall
+                clone_wallet_repo
                 run_wallet_generator
                 read -n 1 -s -r -p "Press any key to return to menu..."
                 ;;
@@ -121,8 +125,4 @@ function main_menu() {
 
 # === Script Execution ===
 check_root
-install_dependencies
-install_bun_if_needed
-clone_wallet_repo
-configure_firewall
 main_menu

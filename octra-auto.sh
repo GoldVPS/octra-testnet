@@ -124,18 +124,16 @@ function run_multisend() {
 
     cd "$folder_name" || exit
 
-    if [ ! -d "venv" ]; then
-        echo -e "${YELLOW}[+] Installing Python & dependencies...${RESET}"
-        apt install -y python3 python3-venv python3-pip screen
+    echo -e "${YELLOW}[+] Installing Python & dependencies...${RESET}"
+    apt install -y python3 python3-venv python3-pip screen
 
-        echo -e "${YELLOW}[+] Setting up Python virtual environment...${RESET}"
-        python3 -m venv venv
-        source venv/bin/activate
+    echo -e "${YELLOW}[+] Setting up Python virtual environment...${RESET}"
+    python3 -m venv venv
+    source venv/bin/activate
 
-        echo -e "${YELLOW}[+] Installing Python requirements...${RESET}"
-        pip install -r requirements.txt
-        deactivate
-    fi
+    echo -e "${YELLOW}[+] Installing Python requirements...${RESET}"
+    pip install -r requirements.txt
+    deactivate
 
     echo ""
     echo -ne "${CYAN}Enter your private key: ${RESET}"
@@ -152,10 +150,25 @@ function run_multisend() {
 EOF
 
     echo -e "${GREEN}[✓] wallet.json created successfully.${RESET}"
+
+    # Buat run.sh otomatis
+    cat > run.sh <<EOF
+#!/bin/bash
+set -e
+if ! command -v python3 &>/dev/null; then echo "python3 not found"; exit 1; fi
+[ ! -d "venv" ] && python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python cli.py || {
+  echo "[!] cli.py exited. Keeping screen open..."
+  while true; do sleep 60; done
+}
+EOF
+
     chmod +x run.sh
 
     echo -e "${YELLOW}[+] Starting run.sh in screen session '${screen_name}'...${RESET}"
-    screen -dmS "$screen_name" bash -c "cd $folder_name && ./run.sh; exec bash"
+    screen -dmS "$screen_name" bash -c "cd $folder_name && ./run.sh"
 
     cd ..
     echo -e "${GREEN}[✓] Multi Send is running in screen: ${CYAN}$screen_name${RESET}"

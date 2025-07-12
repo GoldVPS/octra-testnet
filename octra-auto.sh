@@ -98,14 +98,14 @@ function run_wallet_generator() {
     cd ..
 }
 
-# === Check and Install Bun ===
+# === multi send ===
 function multi_send() {
     echo -e "${YELLOW}[+] Cloning octra_pre_client...${RESET}"
     git clone https://github.com/octra-labs/octra_pre_client.git
     cd octra_pre_client || exit
 
     echo -e "${YELLOW}[+] Installing Python & dependencies...${RESET}"
-    apt install -y python3 python3-venv python3-pip
+    apt install -y python3 python3-venv python3-pip screen
 
     echo -e "${YELLOW}[+] Setting up Python virtual environment...${RESET}"
     python3 -m venv venv
@@ -130,12 +130,15 @@ EOF
 
     echo -e "${GREEN}[✓] wallet.json created successfully.${RESET}"
 
-    echo -e "${YELLOW}[+] Running Multi Send client (run.sh)...${RESET}"
     chmod +x run.sh
-    ./run.sh
+    echo -e "${YELLOW}[+] Starting run.sh inside a screen session 'octra-send'...${RESET}"
+    screen -dmS octra-send bash -c "source venv/bin/activate && ./run.sh"
 
     deactivate
     cd ..
+    echo -e "${GREEN}[✓] Multi Send is running inside screen session named 'octra-send'.${RESET}"
+    echo -e "${CYAN}To view it, run: ${YELLOW}screen -r octra-send${RESET}"
+    echo ""
     read -n 1 -s -r -p "Press any key to return to menu..."
 }
 

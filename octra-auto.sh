@@ -98,21 +98,42 @@ function run_wallet_generator() {
     cd ..
 }
 
+# === get_next_screen_name ===
+function get_next_screen_name() {
+    base="octra-multi"
+    counter=1
+    while screen -list | grep -q "${base}${counter}"; do
+        counter=$((counter + 1))
+    done
+    echo "${base}${counter}"
+}
+
 # === multi send ===
-function multi_send() {
-    echo -e "${YELLOW}[+] Cloning octra_pre_client...${RESET}"
-    git clone https://github.com/octra-labs/octra_pre_client.git
+# === Run MultiSend (Add Wallet) ===
+function run_multisend() {
+    echo -ne "${CYAN}Enter wallet name (e.g. mywallet1): ${RESET}"
+    read -r name
+    screen_name="octra-${name}"
+
+    if [ ! -d "octra_pre_client" ]; then
+        echo -e "${YELLOW}[+] Cloning octra_pre_client...${RESET}"
+        git clone https://github.com/octra-labs/octra_pre_client.git
+    fi
+
     cd octra_pre_client || exit
 
-    echo -e "${YELLOW}[+] Installing Python & dependencies...${RESET}"
-    apt install -y python3 python3-venv python3-pip screen
+    if [ ! -d "venv" ]; then
+        echo -e "${YELLOW}[+] Installing Python & dependencies...${RESET}"
+        apt install -y python3 python3-venv python3-pip screen
 
-    echo -e "${YELLOW}[+] Setting up Python virtual environment...${RESET}"
-    python3 -m venv venv
-    source venv/bin/activate
+        echo -e "${YELLOW}[+] Setting up Python virtual environment...${RESET}"
+        python3 -m venv venv
+        source venv/bin/activate
 
-    echo -e "${YELLOW}[+] Installing Python requirements...${RESET}"
-    pip install -r requirements.txt
+        echo -e "${YELLOW}[+] Installing Python requirements...${RESET}"
+        pip install -r requirements.txt
+        deactivate
+    fi
 
     echo ""
     echo -ne "${CYAN}Enter your private key: ${RESET}"
@@ -129,17 +150,32 @@ function multi_send() {
 EOF
 
     echo -e "${GREEN}[✓] wallet.json created successfully.${RESET}"
-
     chmod +x run.sh
-    echo -e "${YELLOW}[+] Starting run.sh inside a screen session 'octra-send'...${RESET}"
-    screen -dmS octra-send bash -c "source venv/bin/activate && ./run.sh"
 
-    deactivate
+    echo -e "${YELLOW}[+] Starting run.sh in screen session '${screen_name}'...${RESET}"
+    screen -dmS "$screen_name" bash -c "source venv/bin/activate && ./run.sh"
+
     cd ..
-    echo -e "${GREEN}[✓] Multi Send is running inside screen session named 'octra-send'.${RESET}"
-    echo -e "${CYAN}To view it, run: ${YELLOW}screen -r octra-send${RESET}"
+    echo -e "${GREEN}[✓] Multi Send is running in screen: ${CYAN}$screen_name${RESET}"
+    echo -e "${CYAN}To view it: ${YELLOW}screen -r $screen_name${RESET}"
     echo ""
     read -n 1 -s -r -p "Press any key to return to menu..."
+}
+
+# === View Logs (Attach to screen) ===
+function view_multisend_logs() {
+    echo -e "${YELLOW}[+] Active screens:${RESET}"
+    screen -list | grep octra- || echo -e "${RED}No active Multi Send screens found.${RESET}"
+    echo ""
+    echo -ne "${CYAN}Enter screen name to attach (e.g. octra-mywallet1): ${RESET}"
+    read -r screen_to_attach
+
+    if screen -list | grep -q "$screen_to_attach"; then
+        screen -r "$screen_to_attach"
+    else
+        echo -e "${RED}[✘] Screen '$screen_to_attach' not found.${RESET}"
+        read -n 1 -s -r -p "Press any key to return to menu..."
+    fi
 }
 
 # === Main Menu ===
@@ -148,10 +184,11 @@ function main_menu() {
         show_header
         echo -e "${BLUE_LINE}"
         echo -e "${GREEN}1) Create Wallet${RESET}"
-        echo -e "${GREEN}2) Multi Send${RESET}"
-        echo -e "${GREEN}3) Exit${RESET}"
+        echo -e "${GREEN}2) Multi Send (can add more wallets)${RESET}"
+        echo -e "${GREEN}3) View Logs${RESET}"
+        echo -e "${GREEN}4) Exit${RESET}"
         echo -e "${BLUE_LINE}"
-        echo -ne "\nChoose an option [1-3]: "
+        echo -ne "\nChoose an option [1-4]: "
         read -r choice
         case $choice in
             1)
@@ -163,9 +200,12 @@ function main_menu() {
                 read -n 1 -s -r -p "Press any key to return to menu..."
                 ;;
             2)
-                multi_send
+                run_multisend
                 ;;
             3)
+                view_multisend_logs
+                ;;
+            4)
                 echo -e "${GREEN}Exiting...${RESET}"
                 exit 0
                 ;;
@@ -177,6 +217,6 @@ function main_menu() {
     done
 }
 
-# === Script Execution ===
+# === Execute ===
 check_root
 main_menu

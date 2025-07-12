@@ -108,7 +108,6 @@ function get_next_screen_name() {
     echo "${base}${counter}"
 }
 
-# === multi send ===
 # === Run MultiSend (Add Wallet) ===
 function run_multisend() {
     echo -ne "${CYAN}Enter wallet name (e.g. mywallet1): ${RESET}"
@@ -164,17 +163,33 @@ EOF
 
 # === View Logs (Attach to screen) ===
 function view_multisend_logs() {
-    echo -e "${YELLOW}[+] Active screens:${RESET}"
-    screen -list | grep octra- || echo -e "${RED}No active Multi Send screens found.${RESET}"
-    echo ""
-    echo -ne "${CYAN}Enter screen name to attach (e.g. octra-mywallet1): ${RESET}"
-    read -r screen_to_attach
+    echo -e "${YELLOW}[+] Searching for active Multi Send screens...${RESET}"
 
-    if screen -list | grep -q "$screen_to_attach"; then
-        screen -r "$screen_to_attach"
-    else
-        echo -e "${RED}[✘] Screen '$screen_to_attach' not found.${RESET}"
+    # Ambil list screen yang cocok dengan prefix octra-
+    mapfile -t screen_list < <(screen -ls | grep -o "octra-[^[:space:]]*" || true)
+
+    if [ ${#screen_list[@]} -eq 0 ]; then
+        echo -e "${RED}No active Multi Send screens found.${RESET}"
         read -n 1 -s -r -p "Press any key to return to menu..."
+        return
+    fi
+
+    echo -e "${BLUE_LINE}"
+    for i in "${!screen_list[@]}"; do
+        index=$((i + 1))
+        echo -e "${GREEN}${index}) ${screen_list[$i]}${RESET}"
+    done
+    echo -e "${GREEN}$(( ${#screen_list[@]} + 1 ))) Cancel${RESET}"
+    echo -e "${BLUE_LINE}"
+
+    echo -ne "\nChoose a screen to attach [1-${#screen_list[@]}]: "
+    read -r choice
+
+    if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le "${#screen_list[@]}" ]; then
+        screen -r "${screen_list[$((choice - 1))]}"
+    else
+        echo -e "${YELLOW}Cancelled or invalid option.${RESET}"
+        sleep 1
     fi
 }
 

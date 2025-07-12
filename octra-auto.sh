@@ -92,19 +92,61 @@ function run_wallet_generator() {
     cd ..
 }
 
+# === Check and Install Bun ===
+function multi_send() {
+    echo -e "${YELLOW}[+] Cloning octra_pre_client...${RESET}"
+    git clone https://github.com/octra-labs/octra_pre_client.git
+    cd octra_pre_client || exit
+
+    echo -e "${YELLOW}[+] Installing Python & dependencies...${RESET}"
+    apt install -y python3 python3-venv python3-pip
+
+    echo -e "${YELLOW}[+] Setting up Python virtual environment...${RESET}"
+    python3 -m venv venv
+    source venv/bin/activate
+
+    echo -e "${YELLOW}[+] Installing Python requirements...${RESET}"
+    pip install -r requirements.txt
+
+    echo ""
+    echo -ne "${CYAN}Enter your private key: ${RESET}"
+    read -r priv_key
+    echo -ne "${CYAN}Enter your Octra address: ${RESET}"
+    read -r octra_addr
+
+    cat > wallet.json <<EOF
+{
+  "priv": "$priv_key",
+  "addr": "$octra_addr",
+  "rpc": "https://octra.network"
+}
+EOF
+
+    echo -e "${GREEN}[✓] wallet.json created successfully.${RESET}"
+
+    echo -e "${YELLOW}[+] Running Multi Send client (run.sh)...${RESET}"
+    chmod +x run.sh
+    ./run.sh
+
+    deactivate
+    cd ..
+    read -n 1 -s -r -p "Press any key to return to menu..."
+}
+
 # === Main Menu ===
 function main_menu() {
     while true; do
         show_header
         echo -e "${BLUE_LINE}"
         echo -e "${GREEN}1) Create Wallet${RESET}"
-        echo -e "${GREEN}2) Exit${RESET}"
+        echo -e "${GREEN}2) Multi Send${RESET}"
+        echo -e "${GREEN}3) Exit${RESET}"
         echo -e "${BLUE_LINE}"
-        echo -ne "\nChoose an option [1-2]: "
+        echo -ne "\nChoose an option [1-3]: "
         read -r choice
         case $choice in
             1)
-                install_dependencies
+                install_wallet_requirements
                 install_bun_if_needed
                 configure_firewall
                 clone_wallet_repo
@@ -112,6 +154,9 @@ function main_menu() {
                 read -n 1 -s -r -p "Press any key to return to menu..."
                 ;;
             2)
+                multi_send
+                ;;
+            3)
                 echo -e "${GREEN}Exiting...${RESET}"
                 exit 0
                 ;;

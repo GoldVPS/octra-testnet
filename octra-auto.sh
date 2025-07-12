@@ -168,7 +168,7 @@ EOF
     chmod +x run.sh
 
     echo -e "${YELLOW}[+] Starting run.sh in screen session '${screen_name}'...${RESET}"
-    screen -dmS "$screen_name" bash -c "cd $folder_name && ./run.sh"
+    screen -dmS "$screen_name" bash -c "./run.sh"
 
     cd ..
     echo -e "${GREEN}[✓] Multi Send is running in screen: ${CYAN}$screen_name${RESET}"

@@ -88,7 +88,13 @@ function run_wallet_generator() {
     cd wallet-gen || exit
     chmod +x wallet-generator.sh
     echo -e "${YELLOW}[+] Launching wallet-generator.sh...${RESET}"
-    ./wallet-generator.sh
+    ./wallet-generator.sh &
+    sleep 3  # kasih delay agar proses background sempat jalan
+
+    ip=$(curl -s ipv4.icanhazip.com)
+    echo -e "${GREEN}[✓] Wallet Generator is running!${RESET}"
+    echo -e "${CYAN}🔗 Open your browser: http://$ip:8888${RESET}"
+    echo ""
     cd ..
 }
 

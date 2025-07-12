@@ -1,17 +1,17 @@
 #!/bin/bash
 set -e
 
-# === Basic Configuration ===
-LOG_DIR="/root/nexus_logs"
-
 # === Terminal Colors ===
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 YELLOW='\033[1;33m'
 CYAN='\033[0;36m'
 RESET='\033[0m'
+BLUE_LINE="\e[38;5;220m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\e[0m"
 
-# === Header Display ===
+BUN_INSTALL="$HOME/.bun"
+PATH="$BUN_INSTALL/bin:$PATH"
+
 # === Header Display ===
 function show_header() {
     clear
@@ -28,96 +28,101 @@ function show_header() {
     echo ""
 }
 
-# === Cek Root ===
+# === Check Root ===
 function check_root() {
     if [ "$EUID" -ne 0 ]; then
-        echo -e "${RED}Harus dijalankan sebagai root!${RESET}"
+        echo -e "${RED}[✘] Please run this script as root.${RESET}"
         exit 1
     fi
 }
 
-# === Install dependensi dasar ===
-function install_deps() {
-    echo -e "${YELLOW}[+] Memasang dependensi dasar...${RESET}"
+# === Install Base Dependencies ===
+function install_dependencies() {
+    echo -e "${YELLOW}[+] Installing required dependencies (git, curl, unzip, ufw)...${RESET}"
     apt update && apt install -y git curl unzip ufw
 }
 
-# === Cek dan Install Bun ===
-function check_and_install_bun() {
+# === Check and Install Bun ===
+function install_bun_if_needed() {
     if ! command -v bun &> /dev/null; then
-        echo -e "${RED}[!] Bun tidak ditemukan.${RESET}"
-        echo -e "${YELLOW}[+] Mulai install Bun...${RESET}"
+        echo -e "${RED}[!] Bun is not installed.${RESET}"
+        echo -e "${YELLOW}[+] Installing Bun...${RESET}"
 
-        # Pastikan unzip terinstall
+        # Ensure unzip is installed
         if ! command -v unzip &> /dev/null; then
-            echo -e "${YELLOW}[+] unzip belum ada, memasang unzip...${RESET}"
+            echo -e "${YELLOW}[+] 'unzip' is missing, installing...${RESET}"
             apt install -y unzip
         fi
 
         curl -fsSL https://bun.sh/install | bash
+
         export BUN_INSTALL="$HOME/.bun"
         export PATH="$BUN_INSTALL/bin:$PATH"
-        echo -e "${GREEN}[✓] Bun berhasil diinstal.${RESET}"
+
+        echo -e "${GREEN}[✓] Bun has been installed successfully.${RESET}"
     else
-        echo -e "${GREEN}[✓] Bun sudah terinstal.${RESET}"
+        echo -e "${GREEN}[✓] Bun is already installed.${RESET}"
     fi
 }
 
-# === Clone wallet-gen ===
-function clone_repo() {
+# === Clone wallet-gen Repository ===
+function clone_wallet_repo() {
     if [ -d "wallet-gen" ]; then
-        echo -e "${YELLOW}[!] Direktori wallet-gen sudah ada.${RESET}"
+        echo -e "${YELLOW}[!] 'wallet-gen' directory already exists. Skipping clone.${RESET}"
     else
-        echo -e "${YELLOW}[+] Meng-clone repo wallet-gen...${RESET}"
+        echo -e "${YELLOW}[+] Cloning wallet-gen repository...${RESET}"
         git clone https://github.com/octra-labs/wallet-gen.git
     fi
 }
 
-# === Setup Firewall ===
-function setup_firewall() {
-    echo -e "${YELLOW}[+] Mengatur firewall...${RESET}"
+# === Configure Firewall ===
+function configure_firewall() {
+    echo -e "${YELLOW}[+] Configuring firewall rules...${RESET}"
     ufw allow 22/tcp
     ufw allow 8888/tcp
     ufw --force enable
 }
 
-# === Jalankan wallet-generator.sh ===
-function create_wallet() {
+# === Run Wallet Generator ===
+function run_wallet_generator() {
     cd wallet-gen || exit
     chmod +x wallet-generator.sh
+    echo -e "${YELLOW}[+] Launching wallet-generator.sh...${RESET}"
     ./wallet-generator.sh
     cd ..
 }
 
-# === Menu Utama ===
+# === Main Menu ===
 function main_menu() {
     while true; do
         show_header
-        echo -e "${YELLOW}1) Create Wallet${RESET}"
-        echo -e "${YELLOW}2) Exit${RESET}"
-        echo -ne "\nPilih opsi [1-2]: "
+        echo -e "${BLUE_LINE}"
+        echo -e "${GREEN}1) Create Wallet${RESET}"
+        echo -e "${GREEN}2) Exit${RESET}"
+        echo -e "${BLUE_LINE}"
+        echo -ne "\nChoose an option [1-2]: "
         read -r choice
         case $choice in
             1)
-                create_wallet
-                read -n 1 -s -r -p "Tekan tombol apapun untuk kembali ke menu..."
+                run_wallet_generator
+                read -n 1 -s -r -p "Press any key to return to menu..."
                 ;;
             2)
-                echo -e "${GREEN}Keluar...${RESET}"
+                echo -e "${GREEN}Exiting...${RESET}"
                 exit 0
                 ;;
             *)
-                echo -e "${RED}Pilihan tidak valid!${RESET}"
+                echo -e "${RED}Invalid option. Please try again.${RESET}"
                 sleep 1
                 ;;
         esac
     done
 }
 
-# === Eksekusi Awal ===
+# === Script Execution ===
 check_root
-install_deps
-check_and_install_bun
-clone_repo
-setup_firewall
+install_dependencies
+install_bun_if_needed
+clone_wallet_repo
+configure_firewall
 main_menu

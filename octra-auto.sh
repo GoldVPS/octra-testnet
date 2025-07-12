@@ -38,8 +38,8 @@ function check_root() {
 
 # === Install Base Dependencies ===
 function install_dependencies() {
-    echo -e "${YELLOW}[+] Installing required dependencies (git, curl, unzip, ufw)...${RESET}"
-    apt update && apt install -y git curl unzip ufw
+    echo -e "${YELLOW}[+] Installing base dependency: curl and git...${RESET}"
+    apt update && apt install -y curl git
 }
 
 # === Check and Install Bun ===

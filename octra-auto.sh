@@ -110,16 +110,19 @@ function get_next_screen_name() {
 
 # === Run MultiSend (Add Wallet) ===
 function run_multisend() {
-    echo -ne "${CYAN}Enter wallet name (e.g. mywallet1): ${RESET}"
+    echo -ne "${CYAN}Enter wallet name (e.g. wallet1): ${RESET}"
     read -r name
     screen_name="octra-${name}"
+    folder_name="octra_pre_client_${name}"
 
-    if [ ! -d "octra_pre_client" ]; then
-        echo -e "${YELLOW}[+] Cloning octra_pre_client...${RESET}"
-        git clone https://github.com/octra-labs/octra_pre_client.git
+    if [ -d "$folder_name" ]; then
+        echo -e "${YELLOW}[!] Folder '$folder_name' already exists. Skipping clone.${RESET}"
+    else
+        echo -e "${YELLOW}[+] Cloning octra_pre_client into $folder_name...${RESET}"
+        git clone https://github.com/octra-labs/octra_pre_client.git "$folder_name"
     fi
 
-    cd octra_pre_client || exit
+    cd "$folder_name" || exit
 
     if [ ! -d "venv" ]; then
         echo -e "${YELLOW}[+] Installing Python & dependencies...${RESET}"
@@ -152,7 +155,7 @@ EOF
     chmod +x run.sh
 
     echo -e "${YELLOW}[+] Starting run.sh in screen session '${screen_name}'...${RESET}"
-    screen -dmS "$screen_name" bash -c "source venv/bin/activate && ./run.sh"
+    screen -dmS "$screen_name" bash -c "cd $folder_name && source venv/bin/activate && ./run.sh"
 
     cd ..
     echo -e "${GREEN}[✓] Multi Send is running in screen: ${CYAN}$screen_name${RESET}"

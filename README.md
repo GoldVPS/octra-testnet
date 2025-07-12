@@ -50,6 +50,7 @@ chmod +x octra-auto.sh
 🔗 Official Octra Guide
 
 [GENERATE WALLET](https://github.com/octra-labs/wallet-gen)
+
 [MULTISEND](https://github.com/octra-labs/octra_pre_client)
 
 ------------------------------------------------------------

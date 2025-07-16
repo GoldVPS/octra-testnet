@@ -96,6 +96,13 @@ function run_wallet_generator() {
     echo -e "${CYAN}🌐 Once completed, you can access it in your browser at: http://$ip:8888${RESET}"
     echo -e "${CYAN}⏳ Please wait until you see: ${GREEN}wallet generator is running at http://localhost:8888${RESET}"
     echo ""
+    echo -e "${RED}=== ⚠️  SECURITY WARNING ⚠️  ===${RESET}"
+    echo -e "${YELLOW}This tool generates real cryptographic keys. Always:${RESET}"
+    echo -e "  - Keep your private keys secure"
+    echo -e "  - Never share your mnemonic phrase"
+    echo -e "  - Don't store wallet files on cloud services"
+    echo -e "  - Use on a secure, offline computer for production wallets"
+    echo ""
 
     read -p "Press Enter to continue..."
 

@@ -87,13 +87,16 @@ function configure_firewall() {
 function run_wallet_generator() {
     cd wallet-gen || exit
     chmod +x wallet-generator.sh
+
     echo -e "${YELLOW}[+] Launching Octra Wallet Generator...${RESET}"
     ip=$(curl -s ipv4.icanhazip.com)
+
     echo ""
     echo -e "${CYAN}📦 This will download and run the Octra Wallet Generator...${RESET}"
     echo -e "${CYAN}🌐 Once completed, you can access it in your browser at: http://$ip:8888${RESET}"
-    echo -e "${CYAN}⏳ Please wait until you see: wallet generator is running at http://localhost:8888${RESET}"
+    echo -e "${CYAN}⏳ Please wait until you see: ${GREEN}wallet generator is running at http://localhost:8888${RESET}"
     echo ""
+
     read -p "Press Enter to continue..."
 
     # Trap Ctrl+C
@@ -101,6 +104,7 @@ function run_wallet_generator() {
 
     ./wallet-generator.sh
 
+    # Restore default trap after finish
     trap - SIGINT
     cd ..
 }

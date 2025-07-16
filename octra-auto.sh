@@ -88,21 +88,28 @@ function run_wallet_generator() {
     cd wallet-gen || exit
     chmod +x wallet-generator.sh
 
-    ip=$(curl -s ipv4.icanhazip.com)
-
     echo -e "${YELLOW}[+] Launching wallet-generator.sh...${RESET}"
-    echo -e "${CYAN}📦 This will download and run the Octra Wallet Generator...${RESET}"
-    echo -e "${CYAN}🌐 Once completed, you can access it in your browser at: ${YELLOW}http://$ip:8888${RESET}"
-    echo -e "${CYAN}⏳ Please wait until you see: ${GREEN}wallet generator is running at http://localhost:8888${RESET}"
+    echo -e "📦 This will download and run the Octra Wallet Generator..."
+    ip=$(curl -s ipv4.icanhazip.com)
+    echo -e "🌐 Once completed, you can access it in your browser at: ${CYAN}http://$ip:8888${RESET}"
+    echo -e "⏳ Please wait until you see: ${GREEN}wallet generator is running at http://localhost:8888${RESET}"
     echo ""
+    echo -e "${RED}=== ⚠️  SECURITY WARNING ⚠️  ===${RESET}"
+    echo -e "This tool generates real cryptographic keys. Always:"
+    echo -e "  - Keep your private keys secure"
+    echo -e "  - Never share your mnemonic phrase"
+    echo -e "  - Don't store wallet files on cloud services"
+    echo -e "  - Use on a secure, offline computer for production wallets"
+    echo ""
+    read -p "Press enter to continue..."
 
-    ./wallet-generator.sh
+    ./wallet-generator.sh > log_wallet.txt 2>&1 &
+    sleep 3
 
+    echo -e "${GREEN}[✓] Wallet Generator is running!${RESET}"
+    echo -e "${CYAN}🔗 Open your browser: http://$ip:8888${RESET}"
     echo ""
-    echo -e "${GREEN}[✓] Wallet Generator has finished running.${RESET}"
-    echo -e "${CYAN}🔗 Open your browser: ${YELLOW}http://$ip:8888${RESET}"
-    echo ""
-    read -n 1 -s -r -p "Press any key to return to the menu..."
+    read -n 1 -s -r -p "Press any key to return to menu..."
     cd ..
 }
 

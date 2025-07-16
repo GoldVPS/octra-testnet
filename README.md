@@ -21,11 +21,11 @@ designed to be beginner-friendly — even for those with no coding knowledge.
 🚀 How to Use
 
 Run the following commands on Ubuntu 20.04 / 22.04 VPS:
-
+``` bash
 curl -O https://raw.githubusercontent.com/GoldVPS/octra-testnet/main/octra-auto.sh
 chmod +x octra-auto.sh
 ./octra-auto.sh
-
+```
 ------------------------------------------------------------
 
 🧩 Available Menu

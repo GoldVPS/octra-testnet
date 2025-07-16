@@ -88,15 +88,15 @@ function run_wallet_generator() {
     cd wallet-gen || exit
     chmod +x wallet-generator.sh
     echo -e "${YELLOW}[+] Launching wallet-generator.sh...${RESET}"
-    ./wallet-generator.sh
+    ./wallet-generator.sh &> log.txt &
+    sleep 5
 
-    echo ""
-    echo -e "${GREEN}[✓] Wallet Generator installation completed.${RESET}"
     ip=$(curl -s ipv4.icanhazip.com)
+    echo -e "\n${GREEN}[✓] Wallet Generator is running!${RESET}"
     echo -e "${CYAN}🔗 Open your browser: http://$ip:8888${RESET}"
-    echo ""
-    cd ..
+    echo -e ""
     read -n 1 -s -r -p "Press any key to return to menu..."
+    cd ..
 }
 
 # === get_next_screen_name ===
@@ -152,7 +152,6 @@ EOF
 
     echo -e "${GREEN}[✓] wallet.json created successfully.${RESET}"
 
-    # Buat run.sh otomatis
     cat > run.sh <<EOF
 #!/bin/bash
 set -e
@@ -182,7 +181,6 @@ EOF
 function view_multisend_logs() {
     echo -e "${YELLOW}[+] Searching for active Multi Send screens...${RESET}"
 
-    # Ambil list screen yang cocok dengan prefix octra-
     mapfile -t screen_list < <(screen -ls | grep -o "octra-[^[:space:]]*" || true)
 
     if [ ${#screen_list[@]} -eq 0 ]; then
@@ -229,7 +227,6 @@ function main_menu() {
                 configure_firewall
                 clone_wallet_repo
                 run_wallet_generator
-                read -n 1 -s -r -p "Press any key to return to menu..."
                 ;;
             2)
                 run_multisend

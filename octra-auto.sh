@@ -223,7 +223,7 @@ function main_menu() {
         read -r choice
         case $choice in
             1)
-                install_wallet_requirements
+                install_dependencies
                 install_bun_if_needed
                 configure_firewall
                 clone_wallet_repo

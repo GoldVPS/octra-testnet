@@ -88,17 +88,17 @@ function run_wallet_generator() {
     cd wallet-gen || exit
     chmod +x wallet-generator.sh
     echo -e "${YELLOW}[+] Launching wallet-generator.sh...${RESET}"
-    ./wallet-generator.sh &> log.txt &
+    ./wallet-generator.sh
 
-    sleep 5
+    echo ""
+    echo -e "${GREEN}[✓] Wallet Generator installation completed.${RESET}"
     ip=$(curl -s ipv4.icanhazip.com)
-
-    echo -e "\n[✓] Wallet Generator is running!"
-    echo -e "🔗 Open your browser: http://$ip:8888"
-    echo -e "\nPress any key to return to menu..."
-    read -n 1 -s
+    echo -e "${CYAN}🔗 Open your browser: http://$ip:8888${RESET}"
+    echo ""
     cd ..
+    read -n 1 -s -r -p "Press any key to return to menu..."
 }
+
 
 # === get_next_screen_name ===
 function get_next_screen_name() {

@@ -87,23 +87,13 @@ function configure_firewall() {
 function run_wallet_generator() {
     cd wallet-gen || exit
     chmod +x wallet-generator.sh
-
     echo -e "${YELLOW}[+] Launching Octra Wallet Generator...${RESET}"
     ip=$(curl -s ipv4.icanhazip.com)
-
     echo ""
     echo -e "${CYAN}📦 This will download and run the Octra Wallet Generator...${RESET}"
     echo -e "${CYAN}🌐 Once completed, you can access it in your browser at: http://$ip:8888${RESET}"
-    echo -e "${CYAN}⏳ Please wait until you see: ${GREEN}wallet generator is running at http://localhost:8888${RESET}"
+    echo -e "${CYAN}⏳ Please wait until you see: wallet generator is running at http://localhost:8888${RESET}"
     echo ""
-    echo -e "${RED}=== ⚠️  SECURITY WARNING ⚠️  ===${RESET}"
-    echo -e "${YELLOW}This tool generates real cryptographic keys. Always:${RESET}"
-    echo -e "  - Keep your private keys secure"
-    echo -e "  - Never share your mnemonic phrase"
-    echo -e "  - Don't store wallet files on cloud services"
-    echo -e "  - Use on a secure, offline computer for production wallets"
-    echo ""
-
     read -p "Press Enter to continue..."
 
     # Trap Ctrl+C
@@ -111,7 +101,6 @@ function run_wallet_generator() {
 
     ./wallet-generator.sh
 
-    # Restore default trap after finish
     trap - SIGINT
     cd ..
 }
@@ -232,7 +221,7 @@ function main_menu() {
         echo -e "${BLUE_LINE}"
         echo -e "${GREEN}1) Create Wallet${RESET}"
         echo -e "${GREEN}2) Multi Send (can add more wallets)${RESET}"
-        echo -e "${GREEN}3) View Logs${RESET}"
+        echo -e "${GREEN}3) View Wallet${RESET}"
         echo -e "${GREEN}4) Exit${RESET}"
         echo -e "${BLUE_LINE}"
         echo -ne "\nChoose an option [1-4]: "

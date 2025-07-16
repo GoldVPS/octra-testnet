@@ -87,18 +87,24 @@ function configure_firewall() {
 function run_wallet_generator() {
     cd wallet-gen || exit
     chmod +x wallet-generator.sh
+
+    ip=$(curl -s ipv4.icanhazip.com)
+
     echo -e "${YELLOW}[+] Launching wallet-generator.sh...${RESET}"
+    echo -e "${CYAN}📦 This will download and run the Octra Wallet Generator...${RESET}"
+    echo -e "${CYAN}🌐 Once completed, you can access it in your browser at: ${YELLOW}http://$ip:8888${RESET}"
+    echo -e "${CYAN}⏳ Please wait until you see: ${GREEN}wallet generator is running at http://localhost:8888${RESET}"
+    echo ""
+
     ./wallet-generator.sh
 
     echo ""
-    echo -e "${GREEN}[✓] Wallet Generator installation completed.${RESET}"
-    ip=$(curl -s ipv4.icanhazip.com)
-    echo -e "${CYAN}🔗 Open your browser: http://$ip:8888${RESET}"
+    echo -e "${GREEN}[✓] Wallet Generator has finished running.${RESET}"
+    echo -e "${CYAN}🔗 Open your browser: ${YELLOW}http://$ip:8888${RESET}"
     echo ""
+    read -n 1 -s -r -p "Press any key to return to the menu..."
     cd ..
-    read -n 1 -s -r -p "Press any key to return to menu..."
 }
-
 
 # === get_next_screen_name ===
 function get_next_screen_name() {
